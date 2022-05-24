@@ -41,6 +41,7 @@ async function run() {
         const toolsCollection = client.db("toolsCollection").collection('tools');
         const bookingCollection = client.db("toolsCollection").collection('bookings');
         const usersCollection = client.db("toolsCollection").collection('users');
+        const reviewCollection = client.db("toolsCollection").collection('reviews');
 
 
         // get all tools
@@ -135,6 +136,20 @@ async function run() {
             const user = await usersCollection.findOne({ email: email });
             const isAdmin = user.role === 'admin';
             res.send({ admin: isAdmin });
+        })
+
+
+        // post review data
+        app.post('/reviews', async (req, res) => {
+            const review = req.body;
+            const result = await reviewCollection.insertOne(review);
+            res.send(result);
+        });
+
+        // get the reviews from server
+        app.get('/reviews', verifyJWT, async (req, res) => {
+            const result = await reviewCollection.find().toArray();
+            res.send(result)
         })
 
 
