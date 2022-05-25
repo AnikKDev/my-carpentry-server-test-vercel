@@ -192,7 +192,7 @@ async function run() {
         });
 
         // get the reviews from server
-        app.get('/reviews', verifyJWT, async (req, res) => {
+        app.get('/reviews', async (req, res) => {
             const result = await reviewCollection.find().toArray();
             res.send(result)
         })
