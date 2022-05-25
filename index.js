@@ -69,6 +69,14 @@ async function run() {
             res.send(result)
         })
 
+        // find user with id
+        app.get('/user/:email', verifyJWT, async (req, res) => {
+            const email = req.params.email;
+            const query = { email: email };
+            const result = await usersCollection.findOne(query);
+            res.send(result)
+        })
+
 
         // jwt token
         app.put('/user/:email', async (req, res) => {
@@ -84,6 +92,8 @@ async function run() {
             res.send({ result, token });
 
         });
+
+
 
         // post users order
         app.post('/booking', async (req, res) => {
@@ -146,6 +156,24 @@ async function run() {
             }
 
         });
+        // update user
+        app.put('/myprofile/:email', async (req, res) => {
+            const email = req.params.email;
+            const user = req.body;
+            const requesterAccount = await usersCollection.findOne({ email: email });
+            if (requesterAccount) {
+                const filter = { email: email };
+                const options = { upsert: true };
+                const updateDoc = {
+                    $set: user
+                };
+                const result = await usersCollection.updateOne(filter, updateDoc, options);
+                res.send(result);
+            }
+
+        })
+
+
 
         // get an admin from user collection and check wheather he's an admin or not
         app.get('/admin/:email', async (req, res) => {
