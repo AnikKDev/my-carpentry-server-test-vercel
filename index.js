@@ -46,6 +46,18 @@ async function run() {
         const paymentCollection = client.db("toolsCollection").collection('payments');
 
 
+        // admin checkking middleware
+        const verifyAdmin = async (req, res, next) => {
+            const requester = req.decoded.email;
+            const requesterAccount = await usersCollection.findOne({ email: requester });
+            if (requesterAccount.role === 'admin') {
+                next()
+
+            } else {
+                res.status(403).send({ message: ' ADMIN ACCESS ONLY' })
+            }
+        };
+
         // get all tools
         app.get('/tools', async (req, res) => {
             const query = {};
@@ -230,6 +242,21 @@ async function run() {
             const updatedBooking = await bookingCollection.updateOne(filter, updatedDoc);
 
             res.send(updatedBooking)
+        });
+
+
+        // get all bookings for admin
+        app.get('/bookings', verifyJWT, verifyAdmin, async (req, res) => {
+            const result = await bookingCollection.find().toArray();
+            res.send(result);
+        });
+
+        // delete order for admin
+        app.delete('/bookings/:id', verifyJWT, verifyAdmin, async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id) };
+            const result = await bookingCollection.deleteOne(filter);
+            res.send(result);
         })
 
 
