@@ -268,7 +268,7 @@ async function run() {
 run().catch(console.dir);
 
 // APIs
-app.get("/meow", (req, res) => {
+app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
